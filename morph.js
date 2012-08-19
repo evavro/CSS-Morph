@@ -4,12 +4,10 @@
 	// http://www.blooberry.com/indexdot/css/propindex/all.htm
 	// http://api.jquery.com/jQuery.data/
 	// http://www.scriptiny.com/2008/05/javascript-color-fading-script/
-
 	// http://jqueryui.com/demos/animate/
-
 	// http://stackoverflow.com/questions/1004475/jquery-css-plugin-that-returns-computed-style-of-element-to-pseudo-clone-that-el
-
 	// http://www.phpied.com/rgb-color-parser-in-javascript/
+
 	$.getScript('rgbcolor.js', function() {
 	    console.log('RGB color library injected successfully');
 	});
@@ -109,24 +107,24 @@
 
 		// Apply the transition function based on the general property
 	    switch(relevantGenProp(property)) {
+	    	// http://www.phpied.com/rgb-color-parser-in-javascript/
 	     	case 'color':
 	     		var start 	 = new RGBColor(origPropVal), // .toRGB()
 	     			end   	 = new RGBColor(value), // .toRGB()
 	     			duration = $.fn.morph.opts.duration;
 	     		
-				if(start.ok) {
+				if(start.ok && end.ok) {
 					var lerp = function(a, b, u) {
 					    return (1 - u) * a + u * b;
 					};
 
-		     		// fade colors
-		     		console.log("Transitioning color for " + property + " - old: " + start + ", new: " + end + " - duration: " + duration);
+		     		console.log("Transitioning color for " + property + " - old: " + start.toRGB() + ", new: " + end.toRGB() + " - duration: " + duration);
 
 		     		var interval = 10,
 				    	steps = duration / interval,
 				    	step_u = 1.0 / steps,
 				    	u = 0.0;
-				    /*var theInterval = setInterval(function(){
+				    var theInterval = setInterval(function(){
 				    	if (u >= 1.0) { clearInterval(theInterval) }
 
 				        var r = parseInt(lerp(start.r, end.r, u));
@@ -136,7 +134,9 @@
 
 				        elem.style.setProperty(property, colorname);
 				        u += step_u;
-				   	}, interval);*/
+				   	}, interval); //
+
+				   	console.log("Completed transitioning colors");
 				} else {
 					console.log("Failed to transition colors because a color value was invalid - original: " + origPropVal + ", new: " + value);
 				}
