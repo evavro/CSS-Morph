@@ -1,44 +1,13 @@
 <html>
 <head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
-	<script type="text/javascript">
-	/*(function() {
-	    var ev = new $.Event('css'),
-	        orig = $.fn.css;
-	    $.fn.css = function() {
-	        orig.apply(this, arguments);
-	        $(this).trigger(ev);
-	    }
-
-	    // Style change catcher
-		$('#test_opac').bind('css', function(e) {
-		    var style = $(this).attr('css');
-
-		    alert(style);
-		});
-	})();*/
-
-	/*document.documentElement.addEventListener('DOMAttrModified', function(e){
-	  if (e.attrName === 'style') {
-	    console.log('prevValue: ' + e.prevValue, 'newValue: ' + e.newValue);
-	  }
-	}, false);*/
-
-	
-	$(window).bind("resize", methodToFixLayout);
-
-	function methodToFixLayout( e ) {
-	    var winHeight = $(window).height();
-	    var winWidth = $(window).width();
-	    //adjust elements css etc.....
-	    //$("#someDiv").css('someProperty',someValue based on winHeight and winWidth);
-	}
-	
-	</script>
 </head>
 <body>
-	<div style="width: 100%; height: 90px; background-color: #FF0000;" id="test_opac"></div>
-	<input type="button" value="Click to fade" onClick="$('#test_opac').css('background-color', 'pink');">
+	<div style="width: 200px; height: 100px; background-color: #FF0000;" id="test_opac"></div>
+	<p>
+		<input type="button" value="Test 1" onClick="test1();">
+		<input type="button" value="Test 2" onClick="test2();">
+	</p>
 </body>
 </html>
 
@@ -46,5 +15,24 @@
 <script type="text/javascript">
 	//$('*').morph();
 
-	$('#test_opac').morph();
+	$test = $('#test_opac');
+
+	$test.morph();
+
+	function test1() {
+		console.log("Test 1 -------------------------------------------");
+		$test.css('background-color', 'yellow');
+		$test.css('border-radius', '15px');
+		$test.css('width', '800px');
+		$test.css('height', '90px'); // shouldn't run morph because no change is being made
+	}
+
+	function test2() {
+		console.log("Test 2 -------------------------------------------");
+		$test.css('opacity', '.25');
+		$test.css('background-color', 'black');
+		$test.css('height', '300px');
+		$test.css('width', '300px');
+		$test.css('border-radius', '0px');
+	}
 </script>

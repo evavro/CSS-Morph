@@ -17,17 +17,15 @@
 
 			var defaults = {
 	  			'enabled': true,	// TODO
-	  			'color': true, 		// TODO
+	  			'color': true,
 				'size': true,		// TODO
 				'radius': true,		// TODO
 				'position': true,	// TODO
 				'alignment': true,	// TODO
 				'shadow': true,		// TODO
 				'opacity': true,	// TODO
-				'duration': 500 	// let's try to apply 'duration' per property instead of globally (optional!)
+				'duration': 200 	// let's try to apply 'duration' per property instead of globally (optional!)
 	  		};
-
-	  		//var opts = $.extend({ }, $.fn.morph.defaults, options);
 
 	  		var opts = $.extend({ }, defaults, options);
 
@@ -49,21 +47,12 @@
 
 	// safe to use $ here and not cause conflicts
   	$.fn.morph = function(method) { // options
-
-		// COMMENTED OUT BECAUSE I'M TRYING OUT NON-NAMESPACE CLUTTERING TECHNIQUE
-		/*// apply plugin functionality to each element and add the "morph" data property, then chain
-  		return this.each(function() {
-     		 var $this = $(this);
-
-     		 $this.data('morph', true);
-    	});*/
-
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		} else if ( typeof method === 'object' || ! method ) {
 			return methods.init.apply(this, arguments);
 		} else {
-			$.error('Method ' +  method + ' does not exist in jQuery.morph');
+			$.error('Method ' +  method + ' does not exist in the jQuery.morph plugin');
 		}   
   	}
 
@@ -78,11 +67,13 @@
 	    // http://www.quackit.com/css/css3/properties/
 	    // http://www.w3schools.com/css3/css3_animations.asp
 
+	    var duration = $.fn.morph.opts.duration;
+
 	    var origPropVal = window.getComputedStyle(elem).getPropertyValue(property);
 
 	    var generalProperties = {
 	     	'color': 		['color', 'background-color', 'border-color', 'border-top-color', 'border-bottom-color', 'border-right-color', 'border-left-color', 'scrollbar-arrow-color', 'scrollbar-base-color', 'scrollbar-dark-shadow-color', 'scrollbar-face-color', 'scrollbar-highlight-color', 'scrollbar-shadow-color', 'scrollbar-3d-light-color', 'scrollbar-track-color'],
-	     	'size': 		['height, width', 'padding', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right', 'margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'font-size', 'line-height'],
+	     	'size': 		['height', 'width', 'padding', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right', 'margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'font-size', 'line-height'],
 	     	'radius':		['border-radius', '-moz-border-radius', '-moz-border-radius-topleft', '-moz-border-radius-topright', '-moz-border-radius-bottomright', '-moz-border-radius-bottomleft'],
 	     	'position': 	['float', 'top', 'right', 'bottom', 'left', 'background-position-x', 'background-position-y'],
 	     	'alignment': 	[''], // TODO
@@ -97,8 +88,8 @@
 
 		var relevantGenProp = function(prop) {
 			for(genProp in generalProperties) {
-				if($.inArray(prop, genProp)) {
-					console.log("Matched child property '" + property + "' with parent property '" + genProp + "'");
+				if($.inArray(prop, generalProperties[genProp]) > -1) {
+					console.log("Matched child property '" + prop + "' with parent property '" + genProp + "'");
 
 					return genProp;
 				}
@@ -107,12 +98,12 @@
 
 		// Apply the transition function based on the general property
 	    switch(relevantGenProp(property)) {
+
 	    	// http://www.phpied.com/rgb-color-parser-in-javascript/
 	     	case 'color':
 	     		var start 	 = new RGBColor(origPropVal), // .toRGB()
-	     			end   	 = new RGBColor(value), // .toRGB()
-	     			duration = $.fn.morph.opts.duration;
-	     		
+	     			end   	 = new RGBColor(value); // .toRGB()
+	     			
 				if(start.ok && end.ok) {
 					var lerp = function(a, b, u) {
 					    return (1 - u) * a + u * b;
@@ -124,8 +115,11 @@
 				    	steps = duration / interval,
 				    	step_u = 1.0 / steps,
 				    	u = 0.0;
-				    var theInterval = setInterval(function(){
-				    	if (u >= 1.0) { clearInterval(theInterval) }
+
+				    // FIXME the end color is being applied here for some reason (not consistently)
+
+				    var fadeInterval = setInterval(function() {
+				    	if (u >= 1.0) { clearInterval(fadeInterval) }
 
 				        var r = parseInt(lerp(start.r, end.r, u));
 				        var g = parseInt(lerp(start.g, end.g, u));
@@ -133,8 +127,9 @@
 				        var colorname = 'rgb('+r+','+g+','+b+')';
 
 				        elem.style.setProperty(property, colorname);
+
 				        u += step_u;
-				   	}, interval); //
+				   	}, interval);
 
 				   	console.log("Completed transitioning colors");
 				} else {
@@ -143,7 +138,22 @@
 
 	     		break;
 	     	case 'size': case 'radius': case'shadow':
-	     		// increment +1 pixels
+	    		var interval = 10,
+	     			start = stripNonInt(origPropVal),
+	     			end =	stripNonInt(value),
+	     			step = ((end - start) / duration) * interval,
+	     			newSize = start;
+
+	     		console.log('Transitioning size for ' + property + ' [' + start + ' to ' + end + ', step size: ' + step + ']');
+
+	     		var resizeInterval = setInterval(function() {
+	     			newSize += step;
+
+	     			if (newSize == end) { clearInterval(resizeInterval) }
+
+	     			elem.style.setProperty(property, newSize);
+	     		}, interval);
+
 	     		break;
 	     	case 'position':
 	     		// create an invisible temporary element that has the new alignment property and increment towards it's x/y coords
@@ -151,13 +161,14 @@
 	     	case 'alignment': // TODO
 	     		break;
 	     	case 'opacity':
-	     		// increment .1 opacity
+	     		$(elem).animate({opacity: value});
+
 	     		break;
 	    }
 
-	  	return value !== undefined ?
-					jQuery.style(elem, property, value) :
-					jQuery.css(elem, property);
+	  	//return value !== undefined ?
+		//			jQuery.style(elem, property, value) :
+		//			jQuery.css(elem, property); // this could be trouble-some (potential infinite loop)
 
   	}
 
@@ -170,10 +181,16 @@
 		return rgb;
 	} 
 
+	function stripNonInt(value) {
+		return parseInt(value.replace('px', '')
+							 .replace('%', ''));
+	}
+
 	// From jQuery - overriding definition
 	jQuery.fn.css = function(name, value) {
 		return jQuery.access(this, function(elem, name, value) {
 			// TODO: Convert values that are colors from Hex to RGB!
+			// TODO: Determien the type of value that's trying to be changed
 
 			var elemChanging = window.getComputedStyle(elem).getPropertyValue(name) !== value;
 
