@@ -1,13 +1,23 @@
 <html>
 <head>
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<!--<script src="http://code.jquery.com/jquery-latest.js"></script>-->
+	<script src="jquery-1.8.0.js"></script>
 </head>
-<body>
-	<div style="width: 200px; height: 100px; background-color: #FF0000;" id="test_opac"></div>
+<body style="background-color: white">
 	<p>
-		<input type="button" value="Test 1" onClick="test1();">
-		<input type="button" value="Test 2" onClick="test2();">
+		<input type="button" value="Manual Test 1" onClick="test1();">
+		<input type="button" value="Manual Test 2" onClick="test2();">
+		<input type="button" value="Manual Test 3" onClick="test3();">
+		<input type="button" value="Manual Test 4" onClick="test4();">
+		<input type="button" value="Manual Test 5" onClick="test5();">
+		<input type="button" value="Manual Test 6" onClick="test6();">
+		<input type="button" value="Manual Test 7" onClick="test7();">
+		<input type="button" value="2, 5" onClick="test2(); test5();">
 	</p>
+	<p>
+		<input type="button" value="Auto Test 1" onClick="autoTest1()">
+	</p>
+	<div style="position: absolute; width: 200px; height: 100px; background-color: #FF0000;" id="test_opac"></div>
 </body>
 </html>
 
@@ -16,23 +26,64 @@
 	//$('*').morph();
 
 	$test = $('#test_opac');
+	$body = $('body');
 
 	$test.morph();
+	$body.morph();
 
 	function test1() {
-		console.log("Test 1 -------------------------------------------");
+		console.log("Manual Test 1 -------------------------------------------");
 		$test.css('background-color', 'yellow');
 		$test.css('border-radius', '15px');
 		$test.css('width', '800px');
 		$test.css('height', '90px'); // shouldn't run morph because no change is being made
+		$test.css('visibility', 'visible');
 	}
 
 	function test2() {
-		console.log("Test 2 -------------------------------------------");
+		console.log("Manual Test 2 -------------------------------------------");
 		$test.css('opacity', '.25');
-		$test.css('background-color', 'black');
+		$test.css('background-color', '#ffa340');
 		$test.css('height', '300px');
 		$test.css('width', '300px');
 		$test.css('border-radius', '0px');
+	}
+
+	function test3() {
+		console.log("Manual Test 3 -------------------------------------------");
+		$test.css('opacity', '1.0');
+		$test.css('background-color', 'cyan');
+		$test.css('height', '300px');
+		$test.css('width', '300px');
+		$test.css('border-radius', '150px');
+	}
+
+	function test4() {
+		console.log("Manual Test 4 -------------------------------------------");
+		$test.css('height', '250px');
+		$test.css('visibility', 'hidden');
+	}
+
+	function test5() {
+		console.log("Manual Test 5 -------------------------------------------");
+		$body.css('background-color', 'purple');
+	}
+
+	function test6() {
+		console.log("Manual Test 6 -------------------------------------------");
+		$body.css('background-color', 'white');
+	}
+
+	function test7() {
+		console.log("Manual Test 7 -------------------------------------------");
+		$test.css('left', '-200');
+	}
+
+	// Automatic style change test cases
+
+	function autoTest1() {
+		var elem = document.getElementById("test_opac");
+		
+		elem.style.border = "5px solid black";
 	}
 </script>
