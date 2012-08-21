@@ -20,10 +20,11 @@ Make sure you have the latest version of jQuery in your header
 Include Morph at the end of your HTML document along with your assignments
 
 <code>
-<script type="text/javascript" src="morph.js"></script>
-<script type="text/javascript">
+&lt;script type="text/javascript" src="morph.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
 $('*').morph();
-</script>
+&lt;/script&gt;
+</code>
 
 Congratulations, Morph is now installed and ready to use. 
 
