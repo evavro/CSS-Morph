@@ -8,6 +8,8 @@ Morph is a jQuery plugin that provides elegant customizable transitions whenever
 
 It acts as an automatized interface to jQuery's 'animate' utility. Certain animations have been manually re-implemented in order to eliminate dependency on jQuery UI.
 
+NOTE: Morph is still very beta and several of the basic features are still under construction. Progressing quickly though!
+
 Installation
 --------
 
@@ -62,10 +64,10 @@ $('*').morph({auto: false});
 If 'auto' is set to false, style changes will only be detected if jQuery's .css() method is accesssed:
 
 <code>
-$('#test_div').css('background-color', '#000') // Transitions
+$('#test_div').css('background-color', '#000'); // Transitions
 </code>
 <code>
-document.getElementById('test_div').style.setPropert('background-color', '#000') // Does nothing
+document.getElementById('test_div').style.setPropert('background-color', '#000'); // Does nothing
 </code>
 
 Advanced Usage
