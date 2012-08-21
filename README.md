@@ -17,13 +17,19 @@ $('*').morph();
 
 With automatic style transitions, jQuery never even has to be accessed directly by the developer for morph to take place:
 
-<body onClick="document.getElementById('test_div').style.setProperty('background-color', 'red');">
+<code>
+&lt;body onClick="document.getElementById('test_div').style.setProperty('background-color', 'red');"&gt;
+</code>
 
 If you wish to disable automatic detection of style changes through the DOM:
 
+<code>
 $('*').morph({auto: false});
+</code>
 
 If 'auto' is set to false, changes will only be detected if jQuery's .css() method is accesssed:
 
-$('#test_div').css('background-color', '#000') <--- Transitions
-document.getElementById('test_div').style.setPropert('background-color', '#000') <--- Does nothing
+<code>
+$('#test_div').css('background-color', '#000') // Transitions
+document.getElementById('test_div').style.setPropert('background-color', '#000') // Does nothing
+</code>
