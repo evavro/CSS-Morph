@@ -40,7 +40,7 @@ With Morph you cou can easily apply automatic style transitions to every DOM ele
 $('*').morph();
 </code>
 
-or to individual elements; it's simply a matter of your jQuery selector:
+or to individual elements - it's simply a matter of your jQuery selector:
 
 <code>
 $('#test_div').morph();
