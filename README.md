@@ -4,14 +4,33 @@ CSS Morph
 Overview
 --------
 
-A jQuery plugin that provides elegant customizable transitions whenever style properties of a DOM element are changed.
+Morph is a jQuery plugin that provides elegant customizable transitions whenever style properties of a DOM element are changed.
 
-Acts as an automatized interface to jQuery's 'animate' utility. Certain animations have been manually re-implemented in order to eliminate dependency on jQuery UI.
+It acts as an automatized interface to jQuery's 'animate' utility. Certain animations have been manually re-implemented in order to eliminate dependency on jQuery UI.
+
+Installation
+--------
+
+Make sure you have the latest version of jQuery in your header
+
+<code>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+</code>
+
+Include Morph at the end of your HTML document along with your assignments
+
+<code>
+<script type="text/javascript" src="morph.js"></script>
+<script type="text/javascript">
+$('*').morph();
+</script>
+
+Congratulations, Morph is now installed and ready to use. 
 
 Basic Usage
 --------
 
-You can easily apply automatic style transitions to every DOM element
+With Morph you cou can easily apply automatic style transitions to every DOM element
 
 <code>
 $('*').morph();
@@ -23,19 +42,19 @@ or to individual elements; it's simply a matter of your jQuery selector:
 $('#test_div').morph();
 </code>
 
-With automatic style transitions, jQuery never even has to be accessed directly by the developer for morph to take place:
+With automatic style transitions, jQuery never even has to be accessed directly by the developer for transitions to take place:
 
 <code>
 &lt;body onClick="document.getElementById('test_div').style.setProperty('background-color', 'red');"&gt;
 </code>
 
-If you wish to disable automatic detection of style changes through the DOM:
+If you wish, you can disable automatic detection of style changes in the DOM:
 
 <code>
 $('*').morph({auto: false});
 </code>
 
-If 'auto' is set to false, changes will only be detected if jQuery's .css() method is accesssed:
+If 'auto' is set to false, style changes will only be detected if jQuery's .css() method is accesssed:
 
 <code>
 $('#test_div').css('background-color', '#000') // Transitions
