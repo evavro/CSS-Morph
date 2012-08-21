@@ -39,5 +39,7 @@ If 'auto' is set to false, changes will only be detected if jQuery's .css() meth
 
 <code>
 $('#test_div').css('background-color', '#000') // Transitions
+</code>
+<code>
 document.getElementById('test_div').style.setPropert('background-color', '#000') // Does nothing
 </code>
