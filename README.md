@@ -67,3 +67,13 @@ $('#test_div').css('background-color', '#000') // Transitions
 <code>
 document.getElementById('test_div').style.setPropert('background-color', '#000') // Does nothing
 </code>
+
+Advanced Usage
+-----------
+
+Coming soon!
+
+ - Theme switching
+ - Special animations
+ - Coordinated transitions between DOM elements
+ - Suggestions/comments? evavro@gmail.com
