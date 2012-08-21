@@ -14,7 +14,7 @@ Installation
 Make sure you have the latest version of jQuery in your header
 
 <code>
-&lt;script src="http://code.jquery.com/jquery-latest.js"&gt;&lt;/script&gt;
+&lt;script src=&quot;http://code.jquery.com/jquery-latest.js&quot;&gt;&lt;/script&gt;
 </code>
 
 Include Morph at the end of your HTML document along with your assignments
@@ -22,6 +22,7 @@ Include Morph at the end of your HTML document along with your assignments
 <code>
 &lt;script type="text/javascript" src="morph.js"&gt;&lt;/script&gt;
 </code>
+
 <code>
 &lt;script type="text/javascript"&gt;
 $('*').morph();
