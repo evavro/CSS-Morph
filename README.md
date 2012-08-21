@@ -11,13 +11,13 @@ Acts as an automatized interface to jQuery's 'animate' utility. Certain animatio
 Basic Usage
 --------
 
-You can apply automatic style transitions on all elements
+You can easily apply automatic style transitions to every DOM element
 
 <code>
 $('*').morph();
 </code>
 
-or to individual DOM elements; it's simply a matter of your jQuery selector:
+or to individual elements; it's simply a matter of your jQuery selector:
 
 <code>
 $('#test_div').morph();
