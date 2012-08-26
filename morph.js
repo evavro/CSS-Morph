@@ -11,8 +11,12 @@
 	// http://www.quackit.com/css/css3/properties/
 	// http://www.w3schools.com/css3/css3_animations.asp
 
+	function mlog(message) {
+		console.log("[jQuery.Morph] - " + message);
+	}
+
 	$.getScript('rgbcolor.js', function() {
-	    console.log('RGB color library injected successfully');
+	    mlog('RGB color library injected successfully');
 	});
 
 	var morphing = false;
@@ -33,7 +37,10 @@
 				'delay': 0  		// TODO
 	  		};
 
-	  		var jqueryAnims = ['opacity', 'border']; // TODO
+	  		/*var jqueryAnims = {
+	  			'opacity': ['opacity'], 
+				'border'
+			}; // TODO */
 
 	  		var opts = $.extend({ }, defaults, options);
 
@@ -77,14 +84,40 @@
 	    		if(oldHash !== newHash) {
                     oldHash = newHash;
 
-                    console.log("Style change detected in " + self.id);
+                    mlog("Style change detected in " + self.id);
                 }
 			}, 100));
 	    },
 
 	    unwatch: function() {
 	    	clearInterval($(this).data('watch_timer'));
+	    },
+
+	    // TODO
+	    // A path of absolute positions for an element to follow
+	    path: function(path) {
+
+	    },
+
+	    // TODO
+	    // Take in a sequence of style changes and perform them
+	    pattern: function(pattern, repetitions) {
+
 	    }
+	}
+
+	var specialAnims = {
+		explode: function() {
+
+		},
+
+		flatten: function() {
+
+		},
+
+		growToScreen: function() {
+
+		}
 	}
 
   	$.fn.morph = function(method) { // options
@@ -103,7 +136,7 @@
 	    var origPropVal = window.getComputedStyle(elem).getPropertyValue(property);
 
 	    /*if(isNaN(origPropVal)) {
-	    	console.log('WARN: Original property value is not an integer: ' + origPropVal);
+	    	mlog('WARN: Original property value is not an integer: ' + origPropVal);
 
 	    	origPropVal = 0;
 	    }*/
@@ -117,14 +150,14 @@
 	     	'radius':		['border-radius', '-moz-border-radius', '-moz-border-radius-topleft', '-moz-border-radius-topright', '-moz-border-radius-bottomright', '-moz-border-radius-bottomleft'],
 	     	'position': 	['top', 'right', 'bottom', 'left', 'background-position-x', 'background-position-y'],
 	     	'alignment': 	['float'], // TODO
-	     	'shadow':		[''], // TODO
+	     	'shadow':		['box-shadow', '-moz-box-shadow', '-webkit-box-shadow'], // TODO
 	     	'opacity': 		['opacity', '-moz-opacity', 'visibility']
 	    }
 
 		var relevantGenProp = function(prop) {
 			for(genProp in generalProperties) {
 				if($.inArray(prop, generalProperties[genProp]) > -1) {
-					console.log("Matched child property '" + prop + "' with parent property '" + genProp + "'");
+					mlog("Matched child property '" + prop + "' with parent property '" + genProp + "'");
 
 					return genProp;
 				}
@@ -137,15 +170,15 @@
 		// http://www.phpied.com/rgb-color-parser-in-javascript/
 	    switch(relevantGenProp(property)) {
 	     	case 'color':
-	     		var start 	 = new RGBColor(origPropVal), // .toRGB()
-	     			end   	 = new RGBColor(value); // .toRGB()
+	     		var start 	 = new RGBColor(origPropVal),
+	     			end   	 = new RGBColor(value);
 	     			
 				if(start.ok && end.ok) {
 					var lerp = function(a, b, u) {
 					    return (1 - u) * a + u * b;
 					};
 
-		     		console.log("Transitioning color for " + property + " - old: " + start.toRGB() + ", new: " + end.toRGB() + " - duration: " + duration);
+		     		mlog("Transitioning color for " + property + " - old: " + start.toRGB() + ", new: " + end.toRGB() + " - duration: " + duration);
 
 		     		var steps = duration / interval,
 				    	step_u = 1.0 / steps,
@@ -164,9 +197,9 @@
 				        u += step_u;
 				   	}, interval);
 
-				   	console.log("Completed transitioning colors");
+				   	mlog("Completed transitioning colors");
 				} else {
-					console.log("Failed to transition colors because a color value was invalid - original: " + origPropVal + ", new: " + value);
+					mlog("Failed to transition colors because a color value was invalid - original: " + origPropVal + ", new: " + value);
 				}
 
 	     		break;
@@ -176,7 +209,7 @@
 	     			step 		= ((end - start) / duration) * interval,
 	     			newSize 	= start;
 
-	     		console.log('Transitioning size for ' + property + ' [' + start + ' to ' + end + ', step size: ' + step + ']');
+	     		mlog('Transitioning size for ' + property + ' [' + start + ' to ' + end + ', step size: ' + step + ']');
 
 	     		var resizeInterval = setInterval(function() {
 	     			newSize += step;
@@ -188,7 +221,7 @@
 
 	     		break;
 	     	case 'position':
-	     		console.log('Transitioning position for ' + property);
+	     		mlog('Transitioning position for ' + property);
 
 	     		// FIXME - If there's no + or -, assume we want an absolute position
 
@@ -202,7 +235,7 @@
 	     	case 'alignment': // TODO
 	     		break;
 	     	case 'opacity':
-	     		console.log('Transitioning opacity for ' + property);
+	     		mlog('Transitioning opacity for ' + property);
 
 	     		// FIXME - 'visiblity' must be explicity set to 'hidden' in the element of interest
 	     		if(property == "visibility")
@@ -239,8 +272,14 @@
 		}
 	}
 
+	// TODO
+	function parseCSSValueParts(value) {
+		// examples
+		// 1px solid black
+	}
+
 	// From jQuery - overriding definition
-	// FIXME - replace this clunky overriding definition with CSS Hooks - http://api.jquery.com/jQuery.cssHooks/
+	// FIXME - replace this clunky overriding definition with dynamic CSS Hooks - http://api.jquery.com/jQuery.cssHooks/
 	jQuery.fn.css = function(name, value) {
 		return jQuery.access(this, function(elem, name, value) {
 			// TODO: Convert values that are colors from Hex to RGB!
@@ -249,7 +288,7 @@
 			var elemChanging = window.getComputedStyle(elem).getPropertyValue(name) !== value;
 
 			if($(elem).data("morph") == true && elemChanging) {
-				console.log("Morphing CSS property '" + name + "'");
+				mlog("Morphing CSS property '" + name + "'");
 
 				return $.fn.morph.changeCSS(elem, name, value);
 			} else {
