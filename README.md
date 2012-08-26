@@ -78,4 +78,5 @@ Coming soon!
  - Theme switching
  - Special animations
  - Coordinated transitions between DOM elements
+ - Custom easing functions
  - Suggestions/comments? evavro@gmail.com
