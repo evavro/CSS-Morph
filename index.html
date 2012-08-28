@@ -5,19 +5,29 @@
 </head>
 <body style="background-color: white">
 	<p>
-		<input type="button" value="Manual Test 1" onClick="test1();">
-		<input type="button" value="Manual Test 2" onClick="test2();">
-		<input type="button" value="Manual Test 3" onClick="test3();">
-		<input type="button" value="Manual Test 4" onClick="test4();">
-		<input type="button" value="Manual Test 5" onClick="test5();">
-		<input type="button" value="Manual Test 6" onClick="test6();">
-		<input type="button" value="Manual Test 7" onClick="test7();">
+		<input type="button" value="Man Yellow Rec" onClick="test1();">
+		<input type="button" value="Man Red Square" onClick="test2();">
+		<input type="button" value="Man Circle" onClick="test3();">
+		<input type="button" value="Man H:250, Hidden" onClick="test4();">
+		<input type="button" value="Man BG Purple" onClick="test5();">
+		<input type="button" value="Man BG White" onClick="test6();">
+		<input type="button" value="Left -200" onClick="test7();">
+		<input type="button" value="Top 200" onClick="test8();">
+		<input type="button" value="Diag Down" onClick="test9();">
+		<input type="button" value="Natural jQuery Anim" onClick="test10();">
 		<input type="button" value="2, 5" onClick="test2(); test5();">
 	</p>
 	<p>
 		<input type="button" value="Auto Test 1" onClick="autoTest1()">
 	</p>
-	<div style="position: absolute; width: 200px; height: 100px; background-color: #FF0000;" id="test_opac"></div>
+	<div style="position: absolute; width: 200px; height: 100px; background-color: #FF0000; border: 0px solid black;" id="test_opac"></div>
+
+	<div style="position: fixed; bottom: 0; right; 0;">
+		<input type="button" value="Left" onClick="move_left();">
+		<input type="button" value="Right" onClick="move_right();">
+		<input type="button" value="Up" onClick="move_up();">
+		<input type="button" value="Down" onClick="move_down();">
+	</div>
 </body>
 </html>
 
@@ -30,6 +40,26 @@
 
 	$test.morph();
 	$body.morph();
+
+	// Directions
+
+	var moveVal = 50;
+
+	function move_left() {
+		$test.css('left', moveVal);
+	}
+
+	function move_right() {
+		$test.css('right', moveVal);
+	}
+
+	function move_up() {
+		$test.css('top', moveVal);
+	}
+
+	function move_down() {
+		$test.css('bottom', moveVal);
+	}
 
 	function test1() {
 		console.log("Manual Test 1 -------------------------------------------");
@@ -77,6 +107,22 @@
 	function test7() {
 		console.log("Manual Test 7 -------------------------------------------");
 		$test.css('left', '-200');
+	}
+
+	function test8() {
+		console.log("Manual Test 8 -------------------------------------------");
+		$test.css('top', '-200');
+	}
+
+	function test9() {
+		$test.css('top', '-200');
+		$test.css('right', '-200');
+	}
+
+	function test10() {
+		//$test.css('FAKE', '+=200'); // FIXME - not synchronizing correctly - i believe queueing is the culprit
+		$test.css('width', '500px');
+		$test.css('border', '20px');
 	}
 
 	// Automatic style change test cases

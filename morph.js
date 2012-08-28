@@ -1,26 +1,46 @@
 (function($) {
 
-	// http://docs.jquery.com/Plugins/Authoring
-	// http://www.blooberry.com/indexdot/css/propindex/all.htm
-	// http://api.jquery.com/jQuery.data/
-	// http://www.scriptiny.com/2008/05/javascript-color-fading-script/
-	// http://jqueryui.com/demos/animate/
-	// http://stackoverflow.com/questions/1004475/jquery-css-plugin-that-returns-computed-style-of-element-to-pseudo-clone-that-el
-	// http://www.phpied.com/rgb-color-parser-in-javascript/
-	// http://james.padolsey.com/javascript/monitoring-dom-properties/
-	// http://www.quackit.com/css/css3/properties/
-	// http://www.w3schools.com/css3/css3_animations.asp
+	$.getScript('rgbcolor.js', function() {
+	    mlog('RGB color library injected successfully');
+	});
 
 	function mlog(message) {
 		console.log("[jQuery.Morph] - " + message);
 	}
 
-	$.getScript('rgbcolor.js', function() {
-	    mlog('RGB color library injected successfully');
-	});
+	// Global variables
 
 	var morphing = false;
 
+	// These are the CSS properties that can be mapped to animation functions in the jQuery.animation utility
+	var jqueryAnimPropMap = {
+		'opacity': '',
+		'padding': 'paddingWidth',
+		'padding-top': 'paddingTopWidth',
+		'padding-right': 'paddingRightWidth',
+		'padding-bottom': 'paddingBottomWidth',
+		'padding-left': 'paddingLeftWidth',
+		'border': 'borderWidth',
+		'border-top': 'borderTopWidth',
+		'border-right': 'borderRightWidth',
+		'border-bottom': 'borderBottomWidth',
+		'border-left': 'borderLeftWidth',
+		'font-size': 'fontSize',
+		'FAKE': 'left'
+	}
+
+	// CSS properties that must be manually interpreted by Morph (ignore 'auto', it's just an entry to the jQuery animation property map)
+	var generalProperties = {
+	    'color': 		['color', 'background-color', 'border-color', 'border-top-color', 'border-bottom-color', 'border-right-color', 'border-left-color', 'scrollbar-arrow-color', 'scrollbar-base-color', 'scrollbar-dark-shadow-color', 'scrollbar-face-color', 'scrollbar-highlight-color', 'scrollbar-shadow-color', 'scrollbar-3d-light-color', 'scrollbar-track-color'],
+	    'size': 		['height', 'width', 'padding', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right', 'margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'font-size', 'line-height'],
+	    'radius':		['border-radius', '-moz-border-radius', '-moz-border-radius-topleft', '-moz-border-radius-topright', '-moz-border-radius-bottomright', '-moz-border-radius-bottomleft'],
+	    'position': 	['top', 'right', 'bottom', 'left', 'background-position-x', 'background-position-y'],
+	    'alignment': 	['float'], // TODO
+	    'shadow':		['box-shadow', '-moz-box-shadow', '-webkit-box-shadow'], // TODO
+	    'opacity': 		['opacity', '-moz-opacity', 'visibility'],
+	    'auto': 		jqueryAnimPropMap // WARN - This is probably gonna mess with some stuff, a lot of these manual general properties aren't even necessary
+	}
+	
 	var morphMethods = {
 		init : function(options) {
 			var defaults = {
@@ -37,14 +57,12 @@
 				'delay': 0  		// TODO
 	  		};
 
-	  		/*var jqueryAnims = {
-	  			'opacity': ['opacity'], 
-				'border'
-			}; // TODO */
-
 	  		var opts = $.extend({ }, defaults, options);
 
 	  		$.fn.morph.opts = opts;
+
+	  		// TODO - maybe
+	  		// dynamically construct a list of CSS properties that need to be converted to names supported by jQuery.animation
 
 	    	// apply plugin functionality to each element and add the "morph" data property, then chain
 	  		return this.each(function() {
@@ -123,7 +141,7 @@
   	$.fn.morph = function(method) { // options
 		if (morphMethods[method]) {
 			return morphMethods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if ( typeof method === 'object' || ! method ) {
+		} else if (typeof method === 'object' || !method) {
 			return morphMethods.init.apply(this, arguments);
 		} else {
 			$.error('Method ' +  method + ' does not exist in the jQuery.morph plugin');
@@ -135,28 +153,17 @@
   	$.fn.morph.changeCSS = function(elem, property, value) {
 	    var origPropVal = window.getComputedStyle(elem).getPropertyValue(property);
 
-	    /*if(isNaN(origPropVal)) {
-	    	mlog('WARN: Original property value is not an integer: ' + origPropVal);
-
-	    	origPropVal = 0;
-	    }*/
-
 	    var duration = $.fn.morph.opts.duration,
 			interval = 10;
 
-	    var generalProperties = {
-	     	'color': 		['color', 'background-color', 'border-color', 'border-top-color', 'border-bottom-color', 'border-right-color', 'border-left-color', 'scrollbar-arrow-color', 'scrollbar-base-color', 'scrollbar-dark-shadow-color', 'scrollbar-face-color', 'scrollbar-highlight-color', 'scrollbar-shadow-color', 'scrollbar-3d-light-color', 'scrollbar-track-color'],
-	     	'size': 		['height', 'width', 'padding', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right', 'margin', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'font-size', 'line-height'],
-	     	'radius':		['border-radius', '-moz-border-radius', '-moz-border-radius-topleft', '-moz-border-radius-topright', '-moz-border-radius-bottomright', '-moz-border-radius-bottomleft'],
-	     	'position': 	['top', 'right', 'bottom', 'left', 'background-position-x', 'background-position-y'],
-	     	'alignment': 	['float'], // TODO
-	     	'shadow':		['box-shadow', '-moz-box-shadow', '-webkit-box-shadow'], // TODO
-	     	'opacity': 		['opacity', '-moz-opacity', 'visibility']
-	    }
-
 		var relevantGenProp = function(prop) {
 			for(genProp in generalProperties) {
-				if($.inArray(prop, generalProperties[genProp]) > -1) {
+				var genPropCollection =  generalProperties[genProp];
+
+				// Using this logic both arrays and JSON keys are supported
+				if ((genPropCollection instanceof Array && $.inArray(prop, genPropCollection) > -1) ||
+					(genPropCollection instanceof Object && prop in genPropCollection)) {
+
 					mlog("Matched child property '" + prop + "' with parent property '" + genProp + "'");
 
 					return genProp;
@@ -166,8 +173,8 @@
 
 		morphing = true;
 
-		// Apply the transition function based on the general property
-		// http://www.phpied.com/rgb-color-parser-in-javascript/
+		// Apply the manual transition function based on the general property (if necessary)
+		// FIXME - Make most of these cases just modify the origPropVal and value variables as necessary to adhere to jQuery animation
 	    switch(relevantGenProp(property)) {
 	     	case 'color':
 	     		var start 	 = new RGBColor(origPropVal),
@@ -223,6 +230,19 @@
 	     	case 'position':
 	     		mlog('Transitioning position for ' + property);
 
+	     		var switchMap = { 'right': 'left',
+	     						  'bottom': 'top' };
+
+	     		for(switchVal in switchMap) {
+	     			if(property == switchVal) {
+	     				mlog("Warn - Switched value of position property to work with jQuery animation utility: " + switchVal + " -> " + switchMap[switchVal]);
+
+	     				property = switchMap[switchVal];
+	     				value *= -1;
+	     				break;
+	     			}
+	     		}
+
 	     		// FIXME - If there's no + or -, assume we want an absolute position
 
 	     		// FIXME - Utilize this in a more generalized manner for other jQuery animations
@@ -245,6 +265,22 @@
 	     			opacity: value,
 	     			duration: duration
 	     		});
+
+	     		break;
+	     	// FIXME - Since the cases will only pertain to how the original and new values are modified, auto will have to be a special condition outside of this switch statement
+	     	case 'auto':
+	     		// TODO - Make 'queue' optional
+	     		var animProps 	= { queue: false,
+	     							duration: duration },
+
+					newPropName	= jqueryAnimPropMap[property]; // put the CSS property name into a naming convention supported by jQuery animation
+
+				// TODO - Modify 'value' based on the property
+	     		animProps[newPropName] = value;
+
+	     		mlog("AUTO - " + property + " -> " + newPropName + " [" + value + "]");
+
+	     		$(elem).animate(animProps);
 
 	     		break;
 	    }
@@ -276,6 +312,32 @@
 	function parseCSSValueParts(value) {
 		// examples
 		// 1px solid black
+		// 24px;
+		// 10%
+	}
+
+	// TODO - Maybe
+	function createUsableCSSValue(value, requiredType) {
+		/*switch(value) {
+			'auto'
+		}*/
+	}
+
+	// TODO - Implement / decide if it's even worth implementing (as of now, not thinking so)
+	// Converts the naming convention of CSS size-based properties to those supported by jQuery
+	function relationalSizePropName(prop) {
+	  	var relatedJQueryProp = "",
+	  		splitProp = prop.split("-");
+
+	  	if(splitProp.length > 1) {
+	  		var propBaseName = splitProp[0],
+	  			propRelation = splitProp[1];
+
+	  		// Example: border-left -> borderWidthLeft
+	  		return propBaseName + (propRelation.charAt(0).toUpperCase() + propRelation.slice(1)) + "Width";
+	  	}
+
+	  	return propBaseName + 'Width';
 	}
 
 	// From jQuery - overriding definition
