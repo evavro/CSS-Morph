@@ -20,7 +20,9 @@
 	<p>
 		<input type="button" value="Auto Test 1" onClick="autoTest1()">
 	</p>
-	<div style="position: absolute; width: 200px; height: 100px; background-color: #FF0000; border: 0px solid black;" id="test_opac"></div>
+	<div style="position: absolute; width: 200px; height: 100px; background-color: #FF0000; border: 0px solid black;" id="test_opac">
+		Test Text
+	</div>
 
 	<div style="position: fixed; bottom: 0; right; 0;">
 		<input type="button" value="Left" onClick="move_left();">
@@ -38,7 +40,7 @@
 	$test = $('#test_opac');
 	$body = $('body');
 
-	$test.morph();
+	$test.morph({ queue: false });
 	$body.morph();
 
 	// Directions
@@ -116,13 +118,17 @@
 
 	function test9() {
 		$test.css('top', '-200');
-		$test.css('right', '-200');
+		$test.css('right', '200');
 	}
 
 	function test10() {
 		//$test.css('FAKE', '+=200'); // FIXME - not synchronizing correctly - i believe queueing is the culprit
-		$test.css('width', '500px');
-		$test.css('border', '20px');
+		$test.css('width', '500px')
+			 .css('border', '20px') // natural
+			 .css('font-size', '40px') // natural
+			 .css('padding', '20px')
+			 .css('padding-top', '40px')
+			 .css('background-color', 'blue');
 	}
 
 	// Automatic style change test cases
