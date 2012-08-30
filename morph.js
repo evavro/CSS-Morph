@@ -9,7 +9,6 @@
 	}
 
 	// Global variables
-
 	var morphing = false;
 
 	// These are the CSS properties that can be mapped to animation functions in the jQuery.animation utility
@@ -38,7 +37,7 @@
 	    'alignment': 	['float'], // TODO
 	    'shadow':		['box-shadow', '-moz-box-shadow', '-webkit-box-shadow'], // TODO
 	    'opacity': 		['opacity', '-moz-opacity', 'visibility'],
-	    'auto': 		jqueryAnimPropMap // WARN - This is probably gonna mess with some stuff, a lot of these manual general properties aren't even necessary
+	    //'auto': 		jqueryAnimPropMap // WARN - This is probably gonna mess with some stuff, a lot of these manual general properties aren't even necessary
 	}
 	
 	var morphMethods = {
@@ -153,103 +152,100 @@
   	$.fn.morph.changeCSS = function(elem, property, value) {
 	    var origPropVal = window.getComputedStyle(elem).getPropertyValue(property);
 
-	    var duration = $.fn.morph.opts.duration,
+	    var start	 = origPropVal,
+			end		 = value,
+			duration = $.fn.morph.opts.duration,
 			interval = 10;
 
-		var relevantGenProp = function(prop) {
-			for(genProp in generalProperties) {
-				var genPropCollection =  generalProperties[genProp];
-
-				// Using this logic both arrays and JSON keys are supported
-				if ((genPropCollection instanceof Array && $.inArray(prop, genPropCollection) > -1) ||
-					(genPropCollection instanceof Object && prop in genPropCollection)) {
-
-					mlog("Matched child property '" + prop + "' with parent property '" + genProp + "'");
-
-					return genProp;
-				}
-			}
-		}
+		var manualAnimFunc = null;
 
 		morphing = true;
 
-		// Apply the manual transition function based on the general property (if necessary)
+		// Define a manual transition function based on the general property (if necessary)
+		// Also modifies variables from the .css function so they can be used properly
 		// FIXME - Make most of these cases just modify the origPropVal and value variables as necessary to adhere to jQuery animation
 	    switch(relevantGenProp(property)) {
 	     	case 'color':
-	     		var start 	 = new RGBColor(origPropVal),
-	     			end   	 = new RGBColor(value);
-	     			
-				if(start.ok && end.ok) {
-					var lerp = function(a, b, u) {
-					    return (1 - u) * a + u * b;
-					};
+	     		start 	 = new RGBColor(origPropVal);
+	     		end   	 = new RGBColor(value);
 
-		     		mlog("Transitioning color for " + property + " - old: " + start.toRGB() + ", new: " + end.toRGB() + " - duration: " + duration);
+	     		// FIXME - This isn't really adhering to the "pre-modify" variable thing I'm trying to achieve - need to change some var names
+	     		manualAnimFunc = function() {
+					if(start.ok && end.ok) {
+						var lerp = function(a, b, u) {
+							return (1 - u) * a + u * b;
+						};
 
-		     		var steps = duration / interval,
-				    	step_u = 1.0 / steps,
-				    	u = 0.0;
+				     	mlog("Transitioning color for " + property + " - old: " + start.toRGB() + ", new: " + end.toRGB() + " - duration: " + duration);
 
-				    var fadeInterval = setInterval(function() {
-				    	if (u >= 1.0) { clearInterval(fadeInterval) }
+				     	var steps = duration / interval,
+						    step_u = 1.0 / steps,
+						    u = 0.0;
 
-				        var r = parseInt(lerp(start.r, end.r, u));
-				        var g = parseInt(lerp(start.g, end.g, u));
-				        var b = parseInt(lerp(start.b, end.b, u));
-				        var colorname = 'rgb('+r+','+g+','+b+')';
+						var fadeInterval = setInterval(function() {
+						    if (u >= 1.0) { clearInterval(fadeInterval) }
 
-				        elem.style.setProperty(property, colorname);
+						    var r = parseInt(lerp(start.r, end.r, u));
+						    var g = parseInt(lerp(start.g, end.g, u));
+						    var b = parseInt(lerp(start.b, end.b, u));
+						    var colorname = 'rgb('+r+','+g+','+b+')';
 
-				        u += step_u;
-				   	}, interval);
+						    elem.style.setProperty(property, colorname);
 
-				   	mlog("Completed transitioning colors");
-				} else {
-					mlog("Failed to transition colors because a color value was invalid - original: " + origPropVal + ", new: " + value);
+						    u += step_u;
+						}, interval);
+
+						mlog("Completed transitioning colors");
+					} else {
+						mlog("Failed to transition colors because a color value was invalid - original: " + origPropVal + ", new: " + value);
+					}
 				}
 
 	     		break;
 	     	case 'size': case 'radius': case 'shadow':
-	    		var start 		= stripNonInt(origPropVal),
-	     			end 		= stripNonInt(value),
-	     			step 		= ((end - start) / duration) * interval,
-	     			newSize 	= start;
+	    		start 	= stripNonInt(origPropVal);
+	     		end 	= stripNonInt(value);
 
-	     		mlog('Transitioning size for ' + property + ' [' + start + ' to ' + end + ', step size: ' + step + ']');
+	     		manualAnimFunc = function() {
+		     		var	step 		= ((end - start) / duration) * interval,
+		     			newSize 	= start;
 
-	     		var resizeInterval = setInterval(function() {
-	     			newSize += step;
+		     		mlog('Transitioning size for ' + property + ' [' + start + ' to ' + end + ', step size: ' + step + ']');
 
-	     			if (newSize == end) { clearInterval(resizeInterval) }
+		     		var resizeInterval = setInterval(function() {
+		     			newSize += step;
 
-	     			elem.style.setProperty(property, newSize);
-	     		}, interval);
+		     			if (newSize == end) { clearInterval(resizeInterval) }
+
+		     			elem.style.setProperty(property, newSize);
+		     		}, interval);
+		     	}
 
 	     		break;
 	     	case 'position':
 	     		mlog('Transitioning position for ' + property);
 
-	     		var switchMap = { 'right': 'left',
-	     						  'bottom': 'top' };
+	     		var switchPosPropMap = { 'right': 'left',
+	     						  		 'bottom': 'top' };
 
-	     		for(switchVal in switchMap) {
-	     			if(property == switchVal) {
+	     		for(posProp in switchPosPropMap) {
+	     			if(property == posProp) {
 	     				mlog("Warn - Switched value of position property to work with jQuery animation utility: " + switchVal + " -> " + switchMap[switchVal]);
 
-	     				property = switchMap[switchVal];
+	     				property = switchPosPropMap[posProp];
 	     				value *= -1;
 	     				break;
 	     			}
 	     		}
 
 	     		// FIXME - If there's no + or -, assume we want an absolute position
-
 	     		// FIXME - Utilize this in a more generalized manner for other jQuery animations
-	     		var animProps = {};
+	     		/*var animProps = {};
 	     			animProps[property] = ((origPropVal < value) ? '+=' : '-=') + value;
 
-	     		$(elem).animate(animProps);
+	     		$(elem).animate(animProps);*/
+
+	     		value = ((origPropVal < value) ? '+=' : '-=') + value;
 
 	     		break;
 	     	case 'alignment': // TODO
@@ -261,41 +257,57 @@
 	     		if(property == "visibility")
 	     			value = (value == "hidden" ? 0 : 1);
 
-	     		$(elem).animate({
+	     		/*$(elem).animate({
 	     			opacity: value,
 	     			duration: duration
-	     		});
-
-	     		break;
-	     	// FIXME - Since the cases will only pertain to how the original and new values are modified, auto will have to be a special condition outside of this switch statement
-	     	case 'auto':
-	     		// TODO - Make 'queue' optional
-	     		var animProps 	= { queue: false,
-	     							duration: duration },
-
-					newPropName	= jqueryAnimPropMap[property]; // put the CSS property name into a naming convention supported by jQuery animation
-
-				// TODO - Modify 'value' based on the property
-	     		animProps[newPropName] = value;
-
-	     		mlog("AUTO - " + property + " -> " + newPropName + " [" + value + "]");
-
-	     		$(elem).animate(animProps);
+	     		});*/
 
 	     		break;
 	    }
 
+	    // Work with the newly modified property values and start the morphing process
+	    var autoPropName = jqueryAnimPropMap[property];
+
+	    // *** executeAnimation() - ?
+	    // If the CSS property has an animation that's automatically supported by jQuery, apply it. Otherwise, execute a manual animation
+	    if( autoPropName != null ) {
+	    	// TODO - Make 'queue' optional
+	     	var animProps 	= { queue: false,
+	     						duration: duration };
+			
+	     	animProps[autoPropName] = value; // TODO - Modify 'value' based on the property
+
+	     	mlog("AUTO - " + property + " -> " + autoPropName + " [" + value + "]");
+
+	     	$(elem).animate(animProps);
+	    } else if ( manualAnimFunc != null ) {
+	    	manualAnimFunc();
+	    } else {
+	    	mlog("Could not determine a way to morph CSS property " + property); // FIXME - merror()
+	    }
+	    // ***
+
 	    morphing = false;
   	}
 
-  	// Converts colors from Hex to RGB
-	function colorConv(color) {
-		var rgb = [parseInt(color.substring(0,2),16), 
-				   parseInt(color.substring(2,4),16), 
-				   parseInt(color.substring(4,6),16)];
+  	function executeAnimation(property, manualAnimFunc) {
+  		
+  	}
 
-		return rgb;
-	} 
+  	function relevantGenProp(property) {
+		for(genProp in generalProperties) {
+			var genPropCollection =  generalProperties[genProp];
+
+			// Using this logic both arrays and JSON keys are supported
+			if ((genPropCollection instanceof Array && $.inArray(property, genPropCollection) > -1) ||
+				(genPropCollection instanceof Object && property in genPropCollection)) {
+
+				mlog("Matched child property '" + property + "' with parent property '" + genProp + "'");
+
+				return genProp;
+			}
+		}
+	}
 
 	// FIXME - percents obviously need to be handled differently than pixels
 	// also check for operators (+90px, -10%, etc)
